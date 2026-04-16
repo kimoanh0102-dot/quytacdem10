@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Ôn Tập: Quy Tắc Đếm - Đại Số Tổ Hợp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+        body { font-family: 'Quicksand', sans-serif; background: #f4f7f6; color: #333; }
+        .glass { background: #ffffff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e1e8ed; }
+        .intro-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); }
+        .btn-grad { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; transition: all 0.3s ease; }
+        .btn-grad:hover { background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .mathjax-box { overflow-x: auto; max-width: 100%; }
+        .ds-btn.active-true { background-color: #10b981; color: white; border-color: #10b981; }
+        .ds-btn.active-false { background-color: #ef4444; color: white; border-color: #ef4444; }
+        .expl-list { list-style-type: none; padding-left: 0; }
+        .expl-list li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+    <!-- MÀN HÌNH GIỚI THIỆU -->
+    <div id="intro-screen" class="max-w-5xl mx-auto px-4 pt-10 pb-10 min-h-screen flex flex-col items-center justify-center animate__animated animate__zoomIn">
+        <div class="intro-glass p-8 md:p-12 w-full text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500"></div>
+            <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6 uppercase tracking-wider">🚀 Chinh Phục Quy Tắc Đếm 🚀</h1>
+            
+            <div class="mb-8 flex justify-center">
+                <div class="w-full max-w-lg h-64 bg-blue-50 rounded-3xl flex items-center justify-center border-4 border-dashed border-blue-200 shadow-inner">
+                    <span class="text-blue-400 font-semibold text-lg italic flex flex-col items-center gap-2">
+                        <span class="text-6xl mb-2">👨‍🎓👩‍💻</span>
+                        [Hình ảnh Học sinh năng động học Toán]
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
+                <div class="bg-white p-6 rounded-2xl border-2 border-blue-100 hover:border-blue-300 hover:shadow-xl transition-all">
+                    <h3 class="text-2xl font-bold text-blue-700 mb-3 flex items-center">➕ Quy Tắc Cộng</h3>
+                    <p class="text-gray-700 font-medium mb-2 leading-relaxed">Sử dụng khi một công việc có nhiều <b>phương án</b> lựa chọn khác nhau (chọn phương án này thì không chọn phương án kia).</p>
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <p class="text-blue-800 text-sm"><i>Ví dụ:</i> Đi từ A đến B bằng Xe máy (3 cách) <b>hoặc</b> Ô tô (2 cách) $\Rightarrow$ Có $3 + 2 = 5$ cách.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all">
+                    <h3 class="text-2xl font-bold text-purple-700 mb-3 flex items-center">✖️ Quy Tắc Nhân</h3>
+                    <p class="text-gray-700 font-medium mb-2 leading-relaxed">Sử dụng khi một công việc bao gồm nhiều <b>công đoạn</b> liên tiếp nhau (phải hoàn thành tất cả các công đoạn).</p>
+                    <div class="bg-purple-50 p-3 rounded-xl border border-purple-100">
+                        <p class="text-purple-800 text-sm"><i>Ví dụ:</i> Mặc đồ gồm 1 Áo (3 cách) <b>và</b> 1 Quần (4 cách) $\Rightarrow$ Có $3 \times 4 = 12$ cách.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="text-xl px-12 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-black rounded-full shadow-[0_10px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_15px_30px_rgba(37,99,235,0.5)] hover:scale-105 transition-all duration-300 uppercase tracking-widest ring-4 ring-blue-100">
+                🕹️ Bắt Đầu Chơi Ngay
+            </button>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH GAME -->
+    <div id="app" class="max-w-4xl mx-auto px-4 pt-8 hidden">
+        <!-- Header & Progress -->
+        <div class="glass p-6 mb-8 animate__animated animate__fadeIn">
+            <h1 class="text-3xl font-bold text-blue-800 text-center mb-4 uppercase tracking-wide">Đề Ôn Tập: Quy Tắc Đếm</h1>
+            <div class="flex justify-between items-center mb-3 font-semibold text-lg">
+                <span id="part-title" class="text-blue-600 bg-blue-50 px-4 py-1 rounded-full border border-blue-100">Phần 1: Trắc nghiệm</span>
+                <span class="text-gray-600">Câu <span id="question-counter" class="text-blue-600 font-bold">1</span>/<span id="total-questions">22</span></span>
+                <span id="score" class="text-green-600 bg-green-50 px-4 py-1 rounded-full border border-green-100">Điểm: 0.00</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Game Content -->
+        <div id="game-container" class="glass p-8 min-h-[400px] animate__animated animate__fadeIn relative">
+            <!-- Render by JS -->
+        </div>
+
+        <!-- Controls -->
+        <div class="flex justify-between mt-6">
+            <button id="hint-btn" class="bg-amber-100 hover:bg-amber-200 text-amber-700 border border-amber-300 font-bold py-3 px-6 rounded-2xl shadow-sm transition hidden">💡 Xem Giải Thích</button>
+            <button id="next-btn" class="btn-grad font-bold py-3 px-10 rounded-2xl shadow-lg ml-auto hidden">Câu tiếp theo ➔</button>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-10 max-w-md w-full text-center animate__animated animate__zoomIn shadow-2xl">
+            <div id="result-icon" class="text-7xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold text-blue-800 mb-2" id="result-name">BẠN ĐÃ HOÀN THÀNH BÀI THI</h2>
+            <div class="bg-blue-50 rounded-2xl p-6 my-6 border border-blue-100">
+                <p class="text-sm text-gray-500 font-bold mb-1 uppercase">Tổng điểm của bạn</p>
+                <p class="text-5xl font-black text-blue-600" id="result-score">10.00<span class="text-2xl text-gray-400">/10</span></p>
+            </div>
+            <button onclick="location.reload()" class="btn-grad w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wider">Tạo đề & Làm lại</button>
+        </div>
+    </div>
+
+    <script>
+        // Ngân hàng 50 câu hỏi
+        const bankData = {
+            part1: [
+                // --- NHẬN BIẾT (15 câu) ---
+                { id: "p1_1", level: "NB", question: "Một công việc có thể thực hiện theo phương án A (có $m$ cách) hoặc phương án B (có $n$ cách không trùng A). Số cách hoàn thành công việc là:", options: ["$m+n$", "$m.n$", "$m^n$", "$n^m$"], correct: 0, explanation: "Áp dụng quy tắc cộng: Công việc được hoàn thành bởi một trong hai phương án độc lập nên có $m+n$ cách." },
+                { id: "p1_2", level: "NB", question: "Một công việc gồm 2 công đoạn liên tiếp. Công đoạn 1 có $m$ cách, công đoạn 2 có $n$ cách. Số cách hoàn thành công việc là:", options: ["$m+n$", "$m.n$", "$m^n$", "$n^m$"], correct: 1, explanation: "Áp dụng quy tắc nhân: Công việc gồm các công đoạn thực hiện liên tiếp nhau nên có $m.n$ cách." },
+                { id: "p1_3", level: "NB", question: "Một thùng có 9 quả dưa hấu, 10 quả thanh long. Có bao nhiêu cách chọn 1 quả dưa hoặc 1 quả thanh long?", options: ["10", "9", "90", "19"], correct: 3, explanation: "Hành động lấy ra đúng 1 quả là chọn 1 phương án từ 2 loại quả. Quy tắc cộng: $9+10=19$ cách." },
+                { id: "p1_4", level: "NB", question: "Một cửa hàng có 5 áo sơ mi và 4 quần tây. Có bao nhiêu cách chọn 1 bộ gồm 1 áo và 1 quần?", options: ["9", "20", "5", "4"], correct: 1, explanation: "Hành động chọn bộ đồ gồm 2 công đoạn liên tiếp: chọn áo (5 cách) và chọn quần (4 cách). Quy tắc nhân: $5 \\times 4 = 20$ cách." },
+                { id: "p1_5", level: "NB", question: "Lớp 10A có 20 nam và 15 nữ. Hỏi có bao nhiêu cách chọn 1 học sinh làm lớp trưởng?", options: ["35", "300", "20", "15"], correct: 0, explanation: "Học sinh được chọn có thể là nam hoặc nữ. Quy tắc cộng: $20+15=35$ cách." },
+                { id: "p1_6", level: "NB", question: "Từ thành phố A đến B có 3 đường, từ B đến C có 4 đường. Số cách đi từ A đến C qua B là:", options: ["7", "12", "3", "4"], correct: 1, explanation: "Quãng đường gồm 2 công đoạn: Đi A $\\rightarrow$ B (3 cách) và B $\\rightarrow$ C (4 cách). Quy tắc nhân: $3 \\times 4 = 12$ cách." },
+                { id: "p1_7", level: "NB", question: "Trong hộp có 5 bi xanh và 6 bi đỏ. Có bao nhiêu cách lấy ra 1 viên bi?", options: ["11", "30", "5", "6"], correct: 0, explanation: "Lấy 1 viên bi từ tổng số $5+6=11$ viên bi. Quy tắc cộng: $11$ cách." },
+                { id: "p1_8", level: "NB", question: "Gieo một đồng xu 2 lần liên tiếp. Số kết quả có thể xảy ra là:", options: ["2", "4", "6", "8"], correct: 1, explanation: "Lần gieo 1 có 2 khả năng (Sấp/Ngửa). Lần gieo 2 có 2 khả năng. Quy tắc nhân: $2 \\times 2 = 4$ khả năng." },
+                { id: "p1_9", level: "NB", question: "Nhà hàng có 3 món canh và 4 món mặn. Bạn Nam muốn gọi 1 món canh hoặc 1 món mặn. Có bao nhiêu cách?", options: ["7", "12", "3", "4"], correct: 0, explanation: "Từ 'hoặc' chỉ việc chọn 1 phương án duy nhất trong các nhóm. Quy tắc cộng: $3+4=7$ cách." },
+                { id: "p1_10", level: "NB", question: "Có 8 cây bút chì và 6 cây bút bi. Chọn 1 cây bút bất kỳ có số cách là:", options: ["14", "48", "8", "6"], correct: 0, explanation: "Áp dụng quy tắc cộng: $8+6=14$ cách chọn." },
+                { id: "p1_11", level: "NB", question: "Tủ sách có 5 sách Toán, 4 sách Văn. An muốn chọn 1 cuốn Toán và 1 cuốn Văn. Số cách chọn là:", options: ["9", "20", "5", "4"], correct: 1, explanation: "Từ 'và' (chọn đồng thời 2 môn) dùng quy tắc nhân: $5 \\times 4 = 20$ cách." },
+                { id: "p1_12", level: "NB", question: "Cho tập $X$ có 4 phần tử, tập $Y$ có 5 phần tử ($X \\cap Y = \\emptyset$). Số phần tử của $X \\cup Y$ là:", options: ["9", "20", "1", "0"], correct: 0, explanation: "Theo tính chất tập hợp rời rạc (quy tắc cộng): $|X \\cup Y| = |X| + |Y| = 4+5=9$." },
+                { id: "p1_13", level: "NB", question: "An có 3 đôi giày và 4 đôi tất. Số cách chọn 1 đôi giày và 1 đôi tất là:", options: ["7", "12", "3", "4"], correct: 1, explanation: "Cần hoàn thành 2 công đoạn là chọn giày và chọn tất. Quy tắc nhân: $3 \\times 4 = 12$ cách." },
+                { id: "p1_14", level: "NB", question: "Quán phở có bò (tái, chín) và gà (đùi, lườn). Gọi 1 tô phở có bao nhiêu cách?", options: ["2", "4", "8", "6"], correct: 1, explanation: "Phở bò có 2 loại, phở gà có 2 loại. Khách chọn 1 tô nên theo quy tắc cộng: $2+2=4$ cách." },
+                { id: "p1_15", level: "NB", question: "Cửa hàng có 6 loại nước ngọt, 4 loại bia. Chọn mua đúng 1 loại đồ uống có số cách là:", options: ["10", "24", "6", "4"], correct: 0, explanation: "Mua 1 loại đồ uống bất kỳ. Quy tắc cộng: $6+4=10$ cách." },
+                
+                // --- THÔNG HIỂU (9 câu) ---
+                { id: "p1_16", level: "TH", question: "Cho các số $1, 2, 3, 4$. Lập số tự nhiên có 2 chữ số khác nhau. Có bao nhiêu số?", options: ["16", "12", "8", "4"], correct: 1, explanation: "Gọi số là $\\overline{ab}$. Chọn $a$: 4 cách. Chọn $b \\neq a$: 3 cách. Số cách lập: $4 \\times 3 = 12$ số." },
+                { id: "p1_17", level: "TH", question: "Cho tập $A=\\{1;2;3;4;5\\}$. Có bao nhiêu số tự nhiên gồm 3 chữ số từ tập A?", options: ["125", "60", "15", "20"], correct: 0, explanation: "Gọi số là $\\overline{abc}$. Do các chữ số có thể giống nhau, mỗi vị trí $a, b, c$ đều có 5 cách chọn. Tổng số là: $5 \\times 5 \\times 5 = 125$ số." },
+                { id: "p1_18", level: "TH", question: "Bạn Nam cần tạo mật khẩu gồm 3 chữ số từ $\\{1;2;3;4;5;6\\}$. Số mật khẩu là:", options: ["120", "216", "18", "729"], correct: 1, explanation: "Mật khẩu gồm 3 ký tự độc lập (được trùng nhau). Mỗi vị trí có 6 lựa chọn $\\Rightarrow 6 \\times 6 \\times 6 = 216$ mật khẩu." },
+                { id: "p1_19", level: "TH", question: "Từ các chữ số $1, 2, 4, 7$ lập số tự nhiên lẻ có 3 chữ số khác nhau. Có bao nhiêu số?", options: ["12", "24", "6", "18"], correct: 0, explanation: "Gọi số là $\\overline{abc}$. Để là số lẻ, $c \in \\{1, 7\\}$ có 2 cách chọn. Chọn $a$ (khác $c$): 3 cách. Chọn $b$ (khác $a, c$): 2 cách. Số cách là: $2 \\times 3 \\times 2 = 12$ số." },
+                { id: "p1_20", level: "TH", question: "Một hộp có 7 bi đỏ đánh số 1-7, 9 bi xanh đánh số 1-9. Chọn 2 bi khác màu, khác số có:", options: ["63", "56", "16", "15"], correct: 1, explanation: "Chọn 1 bi đỏ: 7 cách. Để bi xanh khác số với bi đỏ vừa chọn, ta bỏ đi viên bi xanh có số đó $\\Rightarrow$ Chọn bi xanh có $9 - 1 = 8$ cách. Số cách chọn: $7 \\times 8 = 56$." },
+                { id: "p1_21", level: "TH", question: "Có 15 sách: 4 Toán, 5 Văn, 6 Anh. Chọn 2 sách khác môn có số cách là:", options: ["74", "120", "105", "15"], correct: 0, explanation: "Có 3 trường hợp: (Toán-Văn): $4 \\times 5 = 20$. (Toán-Anh): $4 \\times 6 = 24$. (Văn-Anh): $5 \\times 6 = 30$. Áp dụng quy tắc cộng: $20 + 24 + 30 = 74$ cách." },
+                { id: "p1_22", level: "TH", question: "Xếp 5 bạn học sinh thành một hàng dọc, trong đó bạn Tùng đứng đầu hàng. Số cách xếp là:", options: ["120", "24", "5", "1"], correct: 1, explanation: "Vị trí 1 xếp Tùng: 1 cách. 4 vị trí còn lại xếp 4 bạn bất kỳ: $4 \\times 3 \\times 2 \\times 1 = 24$ cách." },
+                { id: "p1_23", level: "TH", question: "Gia đình có 3 con. Nếu con đầu là trai, số khả năng giới tính của 3 con là:", options: ["8", "4", "2", "6"], correct: 1, explanation: "Con 1 là Trai (1 k/n). Con 2 có 2 k/n (Trai/Gái). Con 3 có 2 k/n. Tổng cộng: $1 \\times 2 \\times 2 = 4$ khả năng." },
+                { id: "p1_24", level: "TH", question: "Có 4 áo trắng, 5 áo xanh và 3 quần đen. Chọn 1 bộ quần áo khác màu nhau, biết quần luôn đen. Số cách là:", options: ["12", "27", "60", "9"], correct: 1, explanation: "Bộ gồm 1 áo và 1 quần. Quần luôn màu đen (3 cách chọn). Áo không được màu đen (nhưng ở đây áo chỉ có Trắng và Xanh nên cả 9 áo đều thỏa mãn). Chọn áo có $4+5=9$ cách. Chọn bộ: $3 \\times 9 = 27$ cách." },
+                
+                // --- VẬN DỤNG (6 câu) ---
+                { id: "p1_25", level: "VD", question: "Cho $A=\\{0;1;2;3;4\\}$. Số tự nhiên chẵn có 3 chữ số khác nhau lập từ A là:", options: ["30", "48", "60", "18"], correct: 0, explanation: "Gọi số là $\\overline{abc}$. TH1 ($c=0$): a (4 cách), b (3 cách) $\\Rightarrow 4 \\times 3 = 12$ số. TH2 ($c \in \\{2,4\\}$ có 2 cách): a (khác 0, khác c $\\Rightarrow$ 3 cách), b (khác a, c $\\Rightarrow$ 3 cách) $\\Rightarrow 2 \\times 3 \\times 3 = 18$ số. Tổng: $12 + 18 = 30$ số." },
+                { id: "p1_26", level: "VD", question: "Cho tập $B=\\{0;1;2;3;4;5\\}$. Số tự nhiên có 3 chữ số khác nhau và chia hết cho 5 là:", options: ["36", "40", "20", "16"], correct: 0, explanation: "Gọi số là $\\overline{abc}$. TH1 ($c=0$): a (5 cách), b (4 cách) $\\Rightarrow 20$ số. TH2 ($c=5$): a (khác 0, khác c $\\Rightarrow$ 4 cách), b (4 cách) $\\Rightarrow 16$ số. Tổng: $20 + 16 = 36$ số." },
+                { id: "p1_27", level: "VD", question: "Có 5 toa tàu và 5 khách. Có bao nhiêu cách xếp 1 toa có 4 người, 1 toa có 1 người, 3 toa trống?", options: ["100", "120", "25", "20"], correct: 0, explanation: "CĐ1: Chọn người đi 1 mình có 5 cách. CĐ2: Chọn toa cho người này có 5 cách. CĐ3: Bốn người còn lại vào chung 1 toa trong 4 toa còn lại $\\Rightarrow$ có 4 cách chọn toa. Tổng: $5 \\times 5 \\times 4 = 100$ cách." },
+                { id: "p1_28", level: "VD", question: "Cho tập $A=\\{0;1;2;3;4;5\\}$. Lập số chẵn gồm 4 chữ số khác nhau. Có:", options: ["156", "300", "120", "144"], correct: 0, explanation: "Gọi số $\\overline{abcd}$. TH1 ($d=0$): a,b,c có $5 \\times 4 \\times 3 = 60$ số. TH2 ($d \in \\{2,4\\}$): d có 2 cách. a khác 0 (4 cách). b,c có $4 \\times 3 = 12$ cách $\\Rightarrow 2 \\times 4 \\times 12 = 96$ số. Tổng: $60+96=156$ số." },
+                { id: "p1_29", level: "VD", question: "Một người có 7 áo (trong đó 3 áo trắng) và 5 cà vạt (2 cà vạt vàng). Nếu đã chọn áo trắng thì không chọn cà vạt vàng. Số cách chọn 1 áo, 1 cà vạt là:", options: ["35", "29", "15", "6"], correct: 1, explanation: "Tổng số cách chọn 1 áo + 1 cà vạt (không đk): $7 \\times 5 = 35$ cách. Số trường hợp vi phạm điều kiện (chọn áo trắng VÀ cà vạt vàng): $3 \\times 2 = 6$ cách. Số cách thỏa mãn là phần bù: $35 - 6 = 29$ cách." },
+                { id: "p1_30", level: "VD", question: "Bức tường 2x2 ô. Có 4 màu để sơn, mỗi ô 1 màu, 2 ô kề nhau khác màu. Số cách sơn là:", options: ["84", "48", "36", "120"], correct: 0, explanation: "Đánh số 4 ô 1,2,3,4. TH1 (2 ô đường chéo 1 và 4 cùng màu): Ô 1&4 có 4 cách, Ô 2 có 3 cách (khác 1), Ô 3 có 3 cách (khác 1) $\\Rightarrow 4 \\times 1 \\times 3 \\times 3 = 36$. TH2 (2 ô 1 và 4 khác màu): Ô 1 (4 cách), Ô 4 (3 cách). Ô 2 khác 1&4 (2 cách), Ô 3 khác 1&4 (2 cách) $\\Rightarrow 4 \\times 3 \\times 2 \\times 2 = 48$. Tổng: $36+48=84$ cách." }
+            ],
+            part2: [
+                // --- NHẬN BIẾT (4 câu) ---
+                {
+                    id: "p2_1", level: "NB", question: "Ông Minh mua đồ uống từ tạp hóa có 6 loại rượu, 4 loại bia, 3 loại nước ngọt.",
+                    items: [
+                        { text: "Ông Minh chọn 1 loại rượu: có 6 cách.", isTrue: true },
+                        { text: "Ông Minh chọn 1 loại bia: có 4 cách.", isTrue: true },
+                        { text: "Ông Minh chọn 1 nước ngọt: có 3 cách.", isTrue: true },
+                        { text: "Ông Minh có 72 cách chọn mua đúng 1 loại đồ uống.", isTrue: false }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Đúng:</b> Vì quán có 6 loại rượu nên có 6 lựa chọn cho loại đồ uống này.</li>" +
+                                 "<li><b>b) Đúng:</b> Vì quán có 4 loại bia nên có 4 lựa chọn.</li>" +
+                                 "<li><b>c) Đúng:</b> Vì quán có 3 loại nước ngọt nên có 3 lựa chọn.</li>" +
+                                 "<li><b>d) Sai:</b> Yêu cầu là chọn mua <b>đúng 1 loại</b> đồ uống trong tất cả. Đây là bài toán áp dụng Quy tắc cộng (các phương án độc lập, không đồng thời). Số cách chọn là: $6 + 4 + 3 = 13$ cách (không phải quy tắc nhân $6 \\times 4 \\times 3 = 72$).</li>" +
+                                 "</ul>"
+                },
+                {
+                    id: "p2_2", level: "NB", question: "Từ thành phố A đến B có 3 đường, từ B đến C có 4 đường.",
+                    items: [
+                        { text: "Đi từ A đến B có 3 cách.", isTrue: true },
+                        { text: "Đi từ B đến C có 4 cách.", isTrue: true },
+                        { text: "Đi từ A đến C qua B dùng quy tắc cộng.", isTrue: false },
+                        { text: "Số cách đi từ A đến C qua B là 12.", isTrue: true }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Đúng:</b> Theo giả thiết, từ A đến B có 3 con đường.</li>" +
+                                 "<li><b>b) Đúng:</b> Theo giả thiết, từ B đến C có 4 con đường.</li>" +
+                                 "<li><b>c) Sai:</b> Để đi từ A đến C qua B, ta phải thực hiện <b>liên tiếp</b> 2 công đoạn (Đi A $\\rightarrow$ B rồi mới đi B $\\rightarrow$ C). Do đó bắt buộc phải dùng <b>Quy tắc nhân</b>.</li>" +
+                                 "<li><b>d) Đúng:</b> Áp dụng quy tắc nhân cho 2 công đoạn: $3 \\times 4 = 12$ cách.</li>" +
+                                 "</ul>"
+                },
+                {
+                    id: "p2_3", level: "NB", question: "Bạn An có 4 áo và 3 quần khác nhau.",
+                    items: [
+                        { text: "Chọn 1 cái áo HOẶC 1 cái quần có 7 cách.", isTrue: true },
+                        { text: "Chọn 1 cái áo VÀ 1 cái quần có 12 cách.", isTrue: true },
+                        { text: "Nếu An mua thêm 2 cái mũ, số cách chọn 1 bộ (áo, quần, mũ) là 9.", isTrue: false },
+                        { text: "Quy tắc cộng áp dụng cho các phương án thực hiện công việc không đồng thời.", isTrue: true }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Đúng:</b> Từ 'hoặc' ám chỉ chọn 1 món duy nhất. Dùng quy tắc cộng: $4 + 3 = 7$ cách.</li>" +
+                                 "<li><b>b) Đúng:</b> Từ 'và' ám chỉ chọn đồng thời để tạo thành 1 bộ. Dùng quy tắc nhân: $4 \\times 3 = 12$ cách.</li>" +
+                                 "<li><b>c) Sai:</b> Bộ (áo, quần, mũ) là công việc gồm 3 công đoạn liên tiếp. Dùng quy tắc nhân: $4 \\times 3 \\times 2 = 24$ cách (không phải cộng $4+3+2=9$).</li>" +
+                                 "<li><b>d) Đúng:</b> Đây chính là định nghĩa chuẩn của Quy tắc cộng trong sách giáo khoa Đại số.</li>" +
+                                 "</ul>"
+                },
+                {
+                    id: "p2_4", level: "NB", question: "Hộp bút có 4 bút chì, 5 bút bi và 2 bút máy.",
+                    items: [
+                        { text: "Chọn 1 bút chì và 1 bút bi có 20 cách.", isTrue: true },
+                        { text: "Chọn 1 bút chì và 1 bút máy có 4 cách.", isTrue: false },
+                        { text: "Chọn 1 bút bi và 1 bút máy có 7 cách.", isTrue: false },
+                        { text: "Chọn 1 chiếc bút bất kỳ có 11 cách.", isTrue: true }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Đúng:</b> Chọn 2 món (1 chì VÀ 1 bi) là công việc 2 công đoạn. Quy tắc nhân: $4 \\times 5 = 20$ cách.</li>" +
+                                 "<li><b>b) Sai:</b> Tương tự, chọn 1 chì VÀ 1 máy thì có $4 \\times 2 = 8$ cách (không phải 4).</li>" +
+                                 "<li><b>c) Sai:</b> Chọn 1 bi VÀ 1 máy thì có $5 \\times 2 = 10$ cách (không phải 7).</li>" +
+                                 "<li><b>d) Đúng:</b> Chọn 1 chiếc bất kỳ trong tổng số. Dùng quy tắc cộng: $4 + 5 + 2 = 11$ cách.</li>" +
+                                 "</ul>"
+                },
+                // --- THÔNG HIỂU (2 câu) ---
+                {
+                    id: "p2_5", level: "TH", question: "Thư viện có 5 quyển SGK (2 Toán, 2 Văn, 1 Anh) và 7 SBT (3 Toán, 2 Văn, 2 Anh).",
+                    items: [
+                        { text: "Có 35 cách chọn 1 SGK và 1 SBT.", isTrue: true },
+                        { text: "Có 10 cách chọn 2 quyển sách bất kỳ từ kệ khác môn.", isTrue: false },
+                        { text: "Có 12 cách chọn bộ 1 SGK và 1 SBT cùng môn.", isTrue: true },
+                        { text: "Nếu chỉ chọn 1 quyển thì có 12 cách.", isTrue: true }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Đúng:</b> Bộ gồm (1 SGK $\\times$ 1 SBT). Dùng quy tắc nhân: $5 \\times 7 = 35$ cách.</li>" +
+                                 "<li><b>b) Sai:</b> Tổng số sách theo môn là: Toán (2+3=5 quyển), Văn (2+2=4 quyển), Anh (1+2=3 quyển). Chọn 2 quyển khác môn ta chia 3 trường hợp: Toán-Văn ($5 \\times 4 = 20$), Toán-Anh ($5 \\times 3 = 15$), Văn-Anh ($4 \\times 3 = 12$). Tổng số cách là $20 + 15 + 12 = 47$ cách.</li>" +
+                                 "<li><b>c) Đúng:</b> Chọn bộ cùng môn (1 SGK $\\times$ 1 SBT) chia làm 3 trường hợp: Môn Toán ($2 \\times 3 = 6$), Môn Văn ($2 \\times 2 = 4$), Môn Anh ($1 \\times 2 = 2$). Cộng lại ta được $6 + 4 + 2 = 12$ cách.</li>" +
+                                 "<li><b>d) Đúng:</b> Tổng số sách trên kệ là $5 + 7 = 12$ quyển. Lấy ra 1 quyển duy nhất thì có 12 cách.</li>" +
+                                 "</ul>"
+                },
+                {
+                    id: "p2_6", level: "TH", question: "Với số tự nhiên $n = \\overline{abcd}$, biết các chữ số $a, b, c, d \\in \\{1, 2, 3, 4, 5\\}$.",
+                    items: [
+                        { text: "Có 625 số tự nhiên n được lập.", isTrue: true },
+                        { text: "Nếu các chữ số khác nhau thì có 120 số.", isTrue: true },
+                        { text: "Có 256 số n là số lẻ.", isTrue: false },
+                        { text: "Số lượng số chẵn và số lẻ lập được là bằng nhau.", isTrue: false }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Đúng:</b> Mỗi vị trí $a, b, c, d$ đều có 5 lựa chọn (các chữ số được phép trùng lặp). Tổng số là $5^4 = 625$ số.</li>" +
+                                 "<li><b>b) Đúng:</b> Lập số có chữ số khác nhau: $a$ có 5 cách, $b$ có 4 cách, $c$ có 3 cách, $d$ có 2 cách. Số lượng: $5 \\times 4 \\times 3 \\times 2 = 120$ số.</li>" +
+                                 "<li><b>c) Sai:</b> Lập số lẻ tùy ý thì chữ số tận cùng $d \\in \\{1, 3, 5\\}$ (3 cách). Các chữ số $a,b,c$ đứng trước vẫn có 5 lựa chọn tự do. Số lượng số lẻ là $3 \\times 5 \\times 5 \\times 5 = 375$ số.</li>" +
+                                 "<li><b>d) Sai:</b> Trong tập đã cho có 3 chữ số lẻ (1,3,5) nhưng chỉ có 2 chữ số chẵn (2,4). Do đó, lượng số lẻ lập được ($375$ số) nhiều hơn lượng số chẵn lập được ($2 \\times 5^3 = 250$ số).</li>" +
+                                 "</ul>"
+                },
+                // --- VẬN DỤNG (2 câu) ---
+                {
+                    id: "p2_7", level: "VD", question: "Xét số $\\overline{abcde}$ lập từ tập hợp số tự nhiên $\\{0;1;2;3;4;5;6;7;8;9\\}$.",
+                    items: [
+                        { text: "Có 100000 số thỏa mãn định dạng trên.", isTrue: false },
+                        { text: "Có 27216 số có các chữ số đôi một khác nhau.", isTrue: true },
+                        { text: "Có 13440 số đôi một khác nhau và là số lẻ.", isTrue: true },
+                        { text: "Có 13776 số đôi một khác nhau và là số chẵn.", isTrue: true }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Sai:</b> Chữ số hàng vạn $a$ không thể là số 0 nên $a$ chỉ có 9 cách chọn. Bốn vị trí còn lại mỗi vị trí 10 cách $\\Rightarrow$ Có $9 \\times 10^4 = 90000$ số.</li>" +
+                                 "<li><b>b) Đúng:</b> Tính số chữ số khác nhau: Chọn $a \\neq 0$ (9 cách); Chọn $b \\neq a$ (9 cách); Chọn $c$ (8 cách); Chọn $d$ (7 cách); Chọn $e$ (6 cách) $\\Rightarrow 9 \\times 9 \\times 8 \\times 7 \\times 6 = 27216$ số.</li>" +
+                                 "<li><b>c) Đúng:</b> Là số lẻ: $e \\in \\{1,3,5,7,9\\}$ có 5 cách. $a$ khác 0 và $e$ có 8 cách. $b, c, d$ lần lượt có 8, 7, 6 cách. Tích lại: $5 \\times 8 \\times 8 \\times 7 \\times 6 = 13440$ số.</li>" +
+                                 "<li><b>d) Đúng:</b> Tập hợp các số có các chữ số khác nhau được chia làm 2 tập rời rạc: Số lẻ và Số chẵn. Áp dụng đếm phần bù: $27216 - 13440 = 13776$ số chẵn.</li>" +
+                                 "</ul>"
+                },
+                {
+                    id: "p2_8", level: "VD", question: "Cho tập $A = \\{0; 1; 2; 3; 4; 5\\}$. Xét việc lập các số tự nhiên từ A:",
+                    items: [
+                        { text: "Số tự nhiên chẵn có 3 chữ số khác nhau là 20 số.", isTrue: false },
+                        { text: "Số tự nhiên có 3 chữ số khác nhau là 100 số.", isTrue: true },
+                        { text: "Số các số tự nhiên có 3 chữ số khác nhau và chia hết cho 5 là 36 số.", isTrue: true },
+                        { text: "Có 48 số có 3 chữ số khác nhau nhỏ hơn 432.", isTrue: false }
+                    ],
+                    explanation: "<ul class='expl-list'>" +
+                                 "<li><b>a) Sai:</b> Lập số chẵn $\\overline{abc}$ có 2 trường hợp. TH1 tận cùng là số 0: $c=0 \\Rightarrow$ a,b có $5\\times4=20$ số. TH2 tận cùng khác 0: $c \\in \\{2,4\\}$ (2 cách) $\\Rightarrow a \\neq 0,c$ (4 cách), $b$ (4 cách) $\\Rightarrow 2\\times4\\times4=32$ số. Tổng cộng có $20+32=52$ số (không phải 20).</li>" +
+                                 "<li><b>b) Đúng:</b> Lập $\\overline{abc}$: $a \\neq 0$ có 5 cách, $b$ có 5 cách, $c$ có 4 cách $\\Rightarrow 5 \\times 5 \\times 4 = 100$ số.</li>" +
+                                 "<li><b>c) Đúng:</b> Số chia hết cho 5 tận cùng là 0 hoặc 5. Tận cùng $c=0$ có 20 số (như trên). Tận cùng $c=5$: a khác 0,5 (4 cách), b (4 cách) $\\Rightarrow 16$ số. Tổng: $20+16=36$ số.</li>" +
+                                 "<li><b>d) Sai:</b> Lập số $\\overline{abc} < 432$:<br>- $a \\in \\{1,2,3\\}$ (3 cách), b,c tùy ý $\\Rightarrow 3 \\times 5 \\times 4 = 60$ số.<br>- $a=4, b \\in \\{0,1,2\\}$ (3 cách), c tùy ý $\\Rightarrow 1 \\times 3 \\times 4 = 12$ số.<br>- $a=4, b=3, c \\in \\{0,1\\}$ (2 cách) $\\Rightarrow 1 \\times 1 \\times 2 = 2$ số.<br>Tổng cộng có $60 + 12 + 2 = 74$ số (Khác 48).</li>" +
+                                 "</ul>"
+                }
+            ],
+            part3: [
+                // --- NHẬN BIẾT (6 câu) ---
+                { id: "p3_1", level: "NB", question: "Từ 5 điểm phân biệt, vẽ được tối đa bao nhiêu véctơ (khác véctơ không) có điểm đầu và điểm cuối thuộc 5 điểm đã cho?", keywords: ["20", "hai mươi"], explanation: "Chọn điểm đầu: 5 cách. Chọn điểm cuối: 4 cách. $5 \\times 4 = 20$." },
+                { id: "p3_2", level: "NB", question: "Một lớp có 15 nam và 20 nữ. Giáo viên cần gọi 1 học sinh lên bảng giải bài. Có bao nhiêu cách chọn?", keywords: ["35", "ba lăm", "ba mươi lăm"], explanation: "Quy tắc cộng: $15+20=35$ cách." },
+                { id: "p3_3", level: "NB", question: "Bạn A có 6 cuốn tiểu thuyết và 4 cuốn truyện tranh. A muốn đọc 1 cuốn. Có bao nhiêu sự lựa chọn?", keywords: ["10", "mười"], explanation: "$6+4=10$ cách." },
+                { id: "p3_4", level: "NB", question: "Từ A đến B có 4 đường, từ B đến C có 5 đường. Số cách đi từ A qua B đến C là?", keywords: ["20", "hai mươi"], explanation: "Quy tắc nhân: $4 \\times 5 = 20$." },
+                { id: "p3_5", level: "NB", question: "Gieo đồng thời 2 con xúc xắc. Có bao nhiêu kết quả có thể xảy ra?", keywords: ["36", "ba mươi sáu"], explanation: "$6 \\times 6 = 36$." },
+                { id: "p3_6", level: "NB", question: "Hộp có 3 bi đỏ, 4 bi xanh, 5 bi vàng. Số cách lấy ra 1 viên bi là?", keywords: ["12", "mười hai"], explanation: "$3+4+5=12$." },
+                // --- THÔNG HIỂU (4 câu) ---
+                { id: "p3_7", level: "TH", question: "Từ các số 1, 2, 3, 4, 5, 6. Lập được bao nhiêu số tự nhiên có 3 chữ số khác nhau?", keywords: ["120", "một trăm hai mươi"], explanation: "$6 \\times 5 \\times 4 = 120$ số." },
+                { id: "p3_8", level: "TH", question: "Có 5 bưu thiếp và 4 phong bì. Muốn gửi 1 thiếp trong 1 phong bì thì có bao nhiêu cách ghép?", keywords: ["20", "hai mươi"], explanation: "Mỗi thiếp đi với 1 phong bì: $5 \\times 4 = 20$." },
+                { id: "p3_9", level: "TH", question: "Từ 3 kí tự A, B, C lập các chuỗi 3 kí tự sao cho sau A là B, sau B là C. Có bao nhiêu chuỗi?", keywords: ["9", "chín"], explanation: "Lập sơ đồ cây, tìm được 9 chuỗi thỏa mãn: ABC, BCA, BCB, BCC, CAB, CBC, CCA, CCB, CCC." },
+                { id: "p3_10", level: "TH", question: "Đặt mật khẩu 3 chữ số từ {1,2,3,4,5,6}. Có bao nhiêu mật khẩu?", keywords: ["216", "hai trăm mười sáu"], explanation: "Các chữ số được phép trùng: $6 \\times 6 \\times 6 = 216$." },
+                // --- VẬN DỤNG (2 câu) ---
+                { id: "p3_11", level: "VD", question: "Đoàn tàu có 5 toa. Có 5 khách lên tàu. Có bao nhiêu trường hợp 1 toa có 4 người, 1 toa 1 người và 3 toa trống?", keywords: ["100", "một trăm"], explanation: "Chọn 1 người lẻ (5), chọn toa (5), toa cho 4 người (4). Tổng $5 \\times 5 \\times 4 = 100$." },
+                { id: "p3_12", level: "VD", question: "Tường vuông chia 4 ô vuông (2x2). Dùng 4 màu sơn sao cho mỗi ô 1 màu, 2 ô kề không trùng màu. Số cách sơn?", keywords: ["84", "tám tư", "tám mươi tư"], explanation: "TH1 (2 ô chéo cùng màu): 36. TH2 (2 ô chéo khác màu): 48. $36+48=84$ cách." }
+            ]
+        };
+
+        // Biến trạng thái toàn cục
+        let currentTest = { part1: [], part2: [], part3: [] };
+        let currentPartIndex = 1;
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let currentQuestionGlobalIndex = 1;
+        const TEST_TOTAL_QUESTIONS = 22; // 12 + 4 + 6
+
+        // Logic sinh đề thi theo cấu trúc và ma trận
+        function generateTest() {
+            let prevIds = JSON.parse(localStorage.getItem('prevTestIds') || '[]');
+            
+            // Hàm lấy câu hỏi: ưu tiên các câu chưa làm ở lượt trước để đảm bảo tỷ lệ trùng <= 2
+            function sampleQuestions(pool, count, prevIdList) {
+                let unused = pool.filter(q => !prevIdList.includes(q.id)).sort(() => 0.5 - Math.random());
+                let used = pool.filter(q => prevIdList.includes(q.id)).sort(() => 0.5 - Math.random());
+                let res = [];
+                while(res.length < count && unused.length > 0) res.push(unused.pop());
+                while(res.length < count && used.length > 0) res.push(used.pop());
+                return res;
+            }
+
+            // P1: 12 câu (6 NB, 4 TH, 2 VD)
+            currentTest.part1 = [
+                ...sampleQuestions(bankData.part1.filter(q => q.level === 'NB'), 6, prevIds),
+                ...sampleQuestions(bankData.part1.filter(q => q.level === 'TH'), 4, prevIds),
+                ...sampleQuestions(bankData.part1.filter(q => q.level === 'VD'), 2, prevIds)
+            ].sort(() => 0.5 - Math.random());
+
+            // P2: 4 câu (2 NB, 1 TH, 1 VD)
+            currentTest.part2 = [
+                ...sampleQuestions(bankData.part2.filter(q => q.level === 'NB'), 2, prevIds),
+                ...sampleQuestions(bankData.part2.filter(q => q.level === 'TH'), 1, prevIds),
+                ...sampleQuestions(bankData.part2.filter(q => q.level === 'VD'), 1, prevIds)
+            ].sort(() => 0.5 - Math.random());
+
+            // P3: 6 câu (3 NB, 2 TH, 1 VD)
+            currentTest.part3 = [
+                ...sampleQuestions(bankData.part3.filter(q => q.level === 'NB'), 3, prevIds),
+                ...sampleQuestions(bankData.part3.filter(q => q.level === 'TH'), 2, prevIds),
+                ...sampleQuestions(bankData.part3.filter(q => q.level === 'VD'), 1, prevIds)
+            ].sort(() => 0.5 - Math.random());
+
+            // Cập nhật lịch sử
+            let newIds = [
+                ...currentTest.part1.map(q=>q.id), 
+                ...currentTest.part2.map(q=>q.id), 
+                ...currentTest.part3.map(q=>q.id)
+            ];
+            localStorage.setItem('prevTestIds', JSON.stringify(newIds));
+            
+            // Reset trạng thái thi
+            currentPartIndex = 1;
+            currentQuestionIdx = 0;
+            score = 0;
+            currentQuestionGlobalIndex = 1;
+        }
+
+        const container = document.getElementById('game-container');
+        const nextBtn = document.getElementById('next-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const scoreDisplay = document.getElementById('score');
+        const progressBar = document.getElementById('progress-bar');
+        const partTitle = document.getElementById('part-title');
+        const qCounter = document.getElementById('question-counter');
+
+        function renderQuestion() {
+            container.innerHTML = '';
+            nextBtn.classList.add('hidden');
+            hintBtn.classList.add('hidden');
+            
+            let q;
+            if (currentPartIndex === 1) {
+                partTitle.innerText = "Phần 1: Trắc nghiệm (0.25Đ/Câu)";
+                q = currentTest.part1[currentQuestionIdx];
+                renderPart1(q);
+            } else if (currentPartIndex === 2) {
+                partTitle.innerText = "Phần 2: Đúng/Sai (Tối đa 1.0Đ/Câu)";
+                q = currentTest.part2[currentQuestionIdx];
+                renderPart2(q);
+            } else {
+                partTitle.innerText = "Phần 3: Trả lời ngắn (0.5Đ/Câu)";
+                q = currentTest.part3[currentQuestionIdx];
+                renderPart3(q);
+            }
+            if (window.MathJax && typeof window.MathJax.typeset === 'function') {
+                MathJax.typeset();
+            }
+        }
+
+        function renderPart1(q) {
+            const html = `
+                <div class="animate__animated animate__fadeIn">
+                    <div class="mb-6 pb-4 border-b border-gray-100 flex justify-between items-start">
+                        <p class="text-xl font-bold text-gray-800 leading-relaxed pr-4">Câu ${currentQuestionGlobalIndex}: ${q.question}</p>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded whitespace-nowrap">${q.level}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${q.options.map((opt, i) => `
+                            <button onclick="checkPart1(${i})" class="opt-btn group flex items-center p-4 bg-white border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all font-medium text-left">
+                                <span class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex justify-center items-center font-bold mr-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">${String.fromCharCode(65 + i)}</span>
+                                <span class="flex-1">${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function checkPart1(idx) {
+            const q = currentTest.part1[currentQuestionIdx];
+            const btns = document.querySelectorAll('.opt-btn');
+            btns.forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:border-blue-500', 'hover:bg-blue-50');
+            });
+            
+            if (idx === q.correct) {
+                btns[idx].classList.add('bg-green-50', 'border-green-500');
+                btns[idx].querySelector('span').classList.add('bg-green-500', 'text-white');
+                score += 0.25; 
+            } else {
+                btns[idx].classList.add('bg-red-50', 'border-red-500');
+                btns[idx].querySelector('span').classList.add('bg-red-500', 'text-white');
+                
+                btns[q.correct].classList.add('bg-green-50', 'border-green-500');
+                btns[q.correct].querySelector('span').classList.add('bg-green-500', 'text-white');
+            }
+            showExplanation(q.explanation);
+        }
+
+        function renderPart2(q) {
+            const html = `
+                <div class="animate__animated animate__fadeIn">
+                    <div class="mb-6 pb-4 border-b border-gray-100 flex justify-between items-start">
+                        <p class="text-xl font-bold text-gray-800 leading-relaxed pr-4">Câu ${currentQuestionGlobalIndex}: ${q.question}</p>
+                        <span class="bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded whitespace-nowrap">${q.level}</span>
+                    </div>
+                    <div class="space-y-4">
+                        ${q.items.map((item, i) => `
+                            <div class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200">
+                                <span class="flex-1 mb-3 md:mb-0 md:mr-4 font-medium">${String.fromCharCode(97 + i)}) ${item.text}</span>
+                                <div class="flex gap-2 min-w-max">
+                                    <button onclick="selectPart2(${i}, true)" class="ds-btn ds-btn-${i}-true px-6 py-2 rounded-xl border-2 border-gray-300 font-bold hover:bg-gray-200 transition-colors">Đúng</button>
+                                    <button onclick="selectPart2(${i}, false)" class="ds-btn ds-btn-${i}-false px-6 py-2 rounded-xl border-2 border-gray-300 font-bold hover:bg-gray-200 transition-colors">Sai</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button id="check-part2-btn" onclick="checkPart2()" class="mt-6 w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">Kiểm tra kết quả</button>
+                </div>
+            `;
+            container.innerHTML = html;
+            window.tempSelections = new Array(q.items.length).fill(null);
+        }
+
+        function selectPart2(itemIdx, val) {
+            document.querySelector(`.ds-btn-${itemIdx}-true`).classList.remove('active-true');
+            document.querySelector(`.ds-btn-${itemIdx}-false`).classList.remove('active-false');
+            
+            if(val) {
+                document.querySelector(`.ds-btn-${itemIdx}-true`).classList.add('active-true');
+            } else {
+                document.querySelector(`.ds-btn-${itemIdx}-false`).classList.add('active-false');
+            }
+            window.tempSelections[itemIdx] = val;
+        }
+
+        function checkPart2() {
+            if(window.tempSelections.includes(null)) {
+                alert("Vui lòng chọn Đúng/Sai cho tất cả các ý trước khi kiểm tra!");
+                return;
+            }
+
+            const q = currentTest.part2[currentQuestionIdx];
+            let correctCount = 0;
+            
+            document.querySelectorAll('.ds-btn').forEach(b => b.disabled = true);
+
+            window.tempSelections.forEach((sel, i) => {
+                const isCorrect = sel === q.items[i].isTrue;
+                if (isCorrect) {
+                    correctCount++;
+                } else {
+                    const btnClass = sel ? `.ds-btn-${i}-true` : `.ds-btn-${i}-false`;
+                    document.querySelector(btnClass).style.opacity = '0.5';
+                }
+            });
+
+            // Thang điểm Bộ GD: 1 ý=0.1, 2 ý=0.25, 3 ý=0.5, 4 ý=1.0
+            const bonus = [0, 0.1, 0.25, 0.5, 1.0];
+            score += bonus[correctCount];
+            
+            document.getElementById('check-part2-btn').classList.add('hidden');
+            showExplanation(`<div class="mb-3 text-blue-700 font-bold">🎯 Bạn chọn đúng ${correctCount}/4 ý. Cộng ${bonus[correctCount]} điểm.</div>` + q.explanation);
+        }
+
+        function renderPart3(q) {
+            const html = `
+                <div class="animate__animated animate__fadeIn">
+                    <div class="mb-6 pb-4 border-b border-gray-100 flex justify-between items-start">
+                        <p class="text-xl font-bold text-gray-800 leading-relaxed pr-4">Câu ${currentQuestionGlobalIndex}: ${q.question}</p>
+                        <span class="bg-teal-100 text-teal-800 text-xs font-bold px-2 py-1 rounded whitespace-nowrap">${q.level}</span>
+                    </div>
+                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                        <label class="block text-sm font-bold text-blue-800 mb-2 uppercase">Nhập đáp án của bạn (Số/Chữ ngắn gọn)</label>
+                        <input type="text" id="ans-3" class="w-full p-4 border-2 border-blue-200 rounded-xl focus:border-blue-600 focus:ring focus:ring-blue-200 focus:outline-none text-xl font-semibold text-center" placeholder="...">
+                    </div>
+                    <button onclick="checkPart3()" class="mt-6 w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">Gửi đáp án</button>
+                </div>
+            `;
+            container.innerHTML = html;
+            document.getElementById('ans-3').focus();
+        }
+
+        function checkPart3() {
+            const q = currentTest.part3[currentQuestionIdx];
+            const userAns = document.getElementById('ans-3').value.toLowerCase().trim();
+            if(!userAns) { alert("Vui lòng nhập đáp án!"); return; }
+
+            const inputField = document.getElementById('ans-3');
+            inputField.disabled = true;
+
+            const isCorrect = q.keywords.some(k => userAns.includes(k.toLowerCase()));
+            
+            if (isCorrect) {
+                inputField.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                score += 0.5; 
+            } else {
+                inputField.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+            }
+            
+            event.target.classList.add('hidden');
+            showExplanation(`Đáp án đúng: <b class="text-green-600">${q.keywords[0]}</b><br><br>${q.explanation}`);
+        }
+
+        function showExplanation(txt) {
+            const div = document.createElement('div');
+            div.className = "mt-6 p-6 bg-yellow-50 border-2 border-yellow-300 rounded-2xl text-gray-800 animate__animated animate__fadeInUp mathjax-box shadow-sm";
+            div.innerHTML = `<p class="font-black text-amber-600 mb-3 uppercase text-sm flex items-center tracking-wider"><span class="text-2xl mr-2">💡</span> Hướng dẫn giải chi tiết:</p><div class="text-[1.05rem] leading-relaxed font-medium">${txt}</div>`;
+            container.appendChild(div);
+            
+            nextBtn.classList.remove('hidden');
+            updateProgress();
+            if (window.MathJax && typeof window.MathJax.typeset === 'function') {
+                MathJax.typeset();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestionGlobalIndex / TEST_TOTAL_QUESTIONS) * 100;
+            progressBar.style.width = progress + '%';
+            scoreDisplay.innerText = `Điểm: ${score.toFixed(2)}`;
+            qCounter.innerText = currentQuestionGlobalIndex;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestionGlobalIndex++;
+            currentQuestionIdx++;
+
+            if (currentPartIndex === 1 && currentQuestionIdx >= currentTest.part1.length) {
+                currentPartIndex = 2; currentQuestionIdx = 0;
+            } else if (currentPartIndex === 2 && currentQuestionIdx >= currentTest.part2.length) {
+                currentPartIndex = 3; currentQuestionIdx = 0;
+            } else if (currentPartIndex === 3 && currentQuestionIdx >= currentTest.part3.length) {
+                showResult();
+                return;
+            }
+            renderQuestion();
+            updateProgress();
+        });
+
+        function showResult() {
+            document.getElementById('result-modal').classList.remove('hidden');
+            document.getElementById('result-score').innerHTML = `${score.toFixed(2)}<span class="text-2xl text-gray-400">/10</span>`;
+            
+            const icon = document.getElementById('result-icon');
+            const name = document.getElementById('result-name');
+            
+            if (score >= 8) {
+                icon.innerText = "🌟";
+                name.innerText = "XUẤT SẮC!";
+                name.className = "text-4xl font-black text-green-600 mb-2 uppercase";
+            } else if (score >= 5) {
+                icon.innerText = "👍";
+                name.innerText = "ĐẠT YÊU CẦU";
+                name.className = "text-4xl font-black text-blue-600 mb-2 uppercase";
+            } else {
+                icon.innerText = "📚";
+                name.innerText = "CẦN CỐ GẮNG HƠN";
+                name.className = "text-4xl font-black text-red-600 mb-2 uppercase";
+            }
+        }
+
+        // Logic khởi chạy màn hình
+        function startGame() {
+            document.getElementById('intro-screen').classList.add('hidden');
+            const appDiv = document.getElementById('app');
+            appDiv.classList.remove('hidden');
+            appDiv.classList.add('animate__fadeIn');
+            renderQuestion();
+        }
+
+        // Khởi tạo bài thi khi load trang
+        generateTest();
+        // renderQuestion() sẽ được gọi khi bấm nút Bắt Đầu Chơi Ngay
+        if (window.MathJax && typeof window.MathJax.typeset === 'function') {
+            MathJax.typeset();
+        }
+    </script>
+</body>
+</html>
